@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+
+  ubuntu:
+    image: ubuntu:latest
+    container_name: service_web
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:13
+    container_name: odoo_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:16.0
+    container_name: odoo_app
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./config:/etc/odoo
+
+volumes:
+  db_data:
+  odoo_data:
+
